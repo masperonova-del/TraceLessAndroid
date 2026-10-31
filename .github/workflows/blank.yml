@@ -1,9 +1,9 @@
-name: Build APK
+name: Générer un APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main, principal ]
+    branches: [main]
 
 jobs:
   build:
@@ -12,23 +12,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Installer Java 17
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Compiler l’APK debug
+        run: gradle --no-daemon assembleDebug --stacktrace
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
-
-      - name: Upload APK
+      - name: Téléverser l’APK
         uses: actions/upload-artifact@v4
         with:
           name: TraceLess-APK
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
